@@ -1,11 +1,13 @@
 from django.shortcuts import render
 import requests
-
+from decouple import config
 
 def index(request):
     city_name = request.POST.get('city_name')
-    url = 'https://api.openweathermap.org/data/2.5/weather?q={}&units=metric&appid=d8092ef62da14cfdd64d9a05f1646a26'
+    if city_name == None:
+        city_name = 'Ahmedabad' #my-city
     city = city_name
+    url = f"https://api.openweathermap.org/data/2.5/weather?q={city}&units=metric&appid={config('API')}"
     r = requests.get(url.format(city)).json()
 
     city_weather = {
@@ -13,6 +15,7 @@ def index(request):
         'temperate': r['main']['temp'],
         'description': r['weather'][0]['description'],
         'icon': r['weather'][0]['icon'],
+        'country': r['sys']['country'],
     }
 
     context = {'city_weather': city_weather}
